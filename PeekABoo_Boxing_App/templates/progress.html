@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Training Progress - Peek-a-Boo Boxing Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"/>
+    <style>
+        /* (All CSS exactly as you provided) */
+        :root {
+            --primary-color: #dc3545;
+            --secondary-color: #212529;
+            --accent-color: #ffc107;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #fd7e14;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #000 100%);
+            box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand i {
+            color: var(--accent-color);
+        }
+
+        .nav-link {
+            color: #e0e0e0 !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem !important;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color) !important;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><path fill="rgba(255,255,255,0.03)" d="M0,150 Q300,50 600,150 T1200,150 L1200,300 L0,300 Z"/></svg>');
+            background-size: cover;
+        }
+
+        .page-header .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), #c82333);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--warning-color);
+        }
+
+        .chart-card {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 15px 15px 0 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chart-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 1rem;
+        }
+
+        .weekly-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .week-card {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .week-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .week-completion {
+            background: rgba(220, 53, 69, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-color);
+        }
+
+        .week-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .week-stat {
+            text-align: center;
+        }
+
+        .week-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .week-stat-label {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            background: rgba(220, 53, 69, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transition: width 0.5s ease;
+        }
+
+        .session-history {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .history-item {
+            background: rgba(220, 53, 69, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: rgba(220, 53, 69, 0.1);
+            transform: translateX(5px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .history-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .history-ratings {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .rating-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-label {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .rating-stars i {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+        }
+
+        .history-notes {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .filter-section {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+        }
+
+        .insights-section {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(220, 53, 69, 0.05);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-text {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .achievements-section {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .achievement-badge {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-badge:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(255, 193, 7, 0.2));
+            border-color: var(--accent-color);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-badge.unlocked .achievement-icon {
+            color: var(--accent-color);
+        }
+
+        .achievement-badge:not(.unlocked) .achievement-icon {
+            color: #555;
+            opacity: 0.5;
+        }
+
+        .achievement-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-top: 0.5rem;
+        }
+
+        .achievement-badge:not(.unlocked) .achievement-name {
+            color: #777;
+        }
+
+        .footer {
+            background: var(--secondary-color);
+            color: #999;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .history-ratings {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: #999;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #777;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state .btn {
+            background: linear-gradient(135deg, var(--primary-color), #c82333);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(220, 53, 69, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-lightning-charge-fill"></i> PEEK-A-BOO TRACKER
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-fill"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/progress">
+                            <i class="bi bi-graph-up"></i> Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/export/csv">
+                            <i class="bi bi-download"></i> Export CSV
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings">
+                            <i class="bi bi-gear-fill"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="text-white">
+                <h1 class="page-title">
+                    <i class="bi bi-graph-up-arrow"></i> Training Progress & Analytics
+                </h1>
+                <p class="page-subtitle">
+                    Track your journey • Analyze your performance • Achieve your goals
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        {% if total_sessions > 0 %}
+        <!-- Statistics Overview -->
+        <div class="stats-overview fade-in">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="stat-value">{{ total_sessions }}</div>
+                <div class="stat-label">Total Sessions</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-arrow-up"></i>
+                    <span>{{ total_sessions }} / 30 completed</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-water"></i>
+                </div>
+                <div class="stat-value">{{ avg_fluidity }}</div>
+                <div class="stat-label">Avg. Fluidity</div>
+                <div class="stat-change {% if avg_fluidity >= 7 %}positive{% else %}negative{% endif %}">
+                    <i class="bi bi-{% if avg_fluidity >= 7 %}arrow-up{% else %}dash{% endif %}"></i>
+                    <span>{% if avg_fluidity >= 7 %}Excellent{% else %}Keep pushing{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-battery-charging"></i>
+                </div>
+                <div class="stat-value">{{ avg_endurance }}</div>
+                <div class="stat-label">Avg. Endurance</div>
+                <div class="stat-change {% if avg_endurance >= 7 %}positive{% else %}negative{% endif %}">
+                    <i class="bi bi-{% if avg_endurance >= 7 %}arrow-up{% else %}dash{% endif %}"></i>
+                    <span>{% if avg_endurance >= 7 %}Strong{% else %}Building up{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <div class="stat-value">{{ avg_power }}</div>
+                <div class="stat-label">Avg. Power</div>
+                <div class="stat-change {% if avg_power >= 7 %}positive{% else %}negative{% endif %}">
+                    <i class="bi bi-{% if avg_power >= 7 %}arrow-up{% else %}dash{% endif %}"></i>
+                    <span>{% if avg_power >= 7 %}Powerful{% else %}Growing{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Chart -->
+        <div class="chart-card fade-in">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-activity"></i> Performance Trends
+                </h2>
+                <div class="chart-controls">
+                    <button class="chart-btn active" data-metric="all">All</button>
+                    <button class="chart-btn" data-metric="fluidity">Fluidity</button>
+                    <button class="chart-btn" data-metric="endurance">Endurance</button>
+                    <button class="chart-btn" data-metric="power">Power</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Weekly Breakdown -->
+        <div class="chart-card fade-in">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-calendar3"></i> Weekly Breakdown
+                </h2>
+            </div>
+            <div class="weekly-breakdown">
+                {% for week in range(1, 7) %}
+                <div class="week-card">
+                    <div class="week-header">
+                        <div class="week-number">Week {{ week }}</div>
+                        <div class="week-completion">
+                            {% set week_sessions = progress_data | selectattr('week', 'equalto', week) | list %}
+                            {{ week_sessions|length }}/5 Days
+                        </div>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: {{ (week_sessions|length / 5 * 100)|round }}%"></div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="week-stat">
+                            <div class="week-stat-value">
+                                {% if week in weekly_stats %}{{ weekly_stats[week].fluidity }}{% else %}0{% endif %}
+                            </div>
+                            <div class="week-stat-label">Fluidity</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-value">
+                                {% if week in weekly_stats %}{{ weekly_stats[week].endurance }}{% else %}0{% endif %}
+                            </div>
+                            <div class="week-stat-label">Endurance</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-value">
+                                {% if week in weekly_stats %}{{ weekly_stats[week].power }}{% else %}0{% endif %}
+                            </div>
+                            <div class="week-stat-label">Power</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="insights-section fade-in">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-lightbulb-fill"></i> Training Insights
+                </h2>
+            </div>
+            <div id="insightsContainer">
+                <!-- Dynamic insights will be added here -->
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="achievements-section fade-in">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-trophy-fill"></i> Achievements
+                </h2>
+            </div>
+            <div class="achievement-grid">
+                <div class="achievement-badge {% if total_sessions >= 1 %}unlocked{% endif %}">
+                    <div class="achievement-icon">🥊</div>
+                    <div class="achievement-name">First Steps</div>
+                </div>
+                <div class="achievement-badge {% if total_sessions >= 5 %}unlocked{% endif %}">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-name">Week Warrior</div>
+                </div>
+                <div class="achievement-badge {% if total_sessions >= 15 %}unlocked{% endif %}">
+                    <div class="achievement-icon">💪</div>
+                    <div class="achievement-name">Half Way</div>
+                </div>
+                <div class="achievement-badge {% if total_sessions >= 30 %}unlocked{% endif %}">
+                    <div class="achievement-icon">🏆</div>
+                    <div class="achievement-name">Champion</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session History -->
+        <div class="session-history fade-in">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-clock-history"></i> Session History
+                </h2>
+            </div>
+            <div id="historyList">
+                {% for s in progress_data %}
+                <div class="history-item" data-date="{{ s.date }}" onclick="showNotes('{{ loop.index0 }}')">
+                    <div class="history-header">
+                        <div>
+                            <div class="history-title">Session {{ loop.index }} — Week {{ s.week }}</div>
+                            <div class="history-date">{{ s.date }}</div>
+                        </div>
+                        <div class="history-meta text-end">
+                            <div><small class="text-muted">F: {{ s.fluidity }} • E: {{ s.endurance }} • P: {{ s.power }}</small></div>
+                        </div>
+                    </div>
+                    <div class="history-ratings">
+                        <div class="rating-item">
+                            <div class="rating-label">Fluidity</div>
+                            <div class="rating-stars">
+                                {% for i in range(0, s.fluidity|int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Endurance</div>
+                            <div class="rating-stars">
+                                {% for i in range(0, s.endurance|int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Power</div>
+                            <div class="rating-stars">
+                                {% for i in range(0, s.power|int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-notes" id="notes-{{ loop.index0 }}" style="display:none;">
+                        {{ s.notes }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-emoji-frown"></i>
+            <h3>No sessions yet</h3>
+            <p>Start training and your sessions will appear here.</p>
+            <a href="/" class="btn">Add first session</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <small>Peek-a-Boo Tracker • Built for trainers & fighters • © {{ (now().year if now is defined else '') }}</small>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Template data injected by Flask
+        const progressData = {{ progress_data|tojson }};
+        const weeklyStats = {{ weekly_stats|tojson }};
+        const totalSessions = {{ total_sessions }};
+        const avgFluidity = {{ avg_fluidity }};
+        const avgEndurance = {{ avg_endurance }};
+        const avgPower = {{ avg_power }};
+
+        // Build labels and datasets
+        const labels = progressData.map(s => s.date);
+        const fluidity = progressData.map(s => s.fluidity);
+        const endurance = progressData.map(s => s.endurance);
+        const power = progressData.map(s => s.power);
+
+        const ctx = document.getElementById('progressChart').getContext('2d');
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Fluidity',
+                        data: fluidity,
+                        tension: 0.25,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        hidden: false,
+                    },
+                    {
+                        label: 'Endurance',
+                        data: endurance,
+                        tension: 0.25,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        hidden: false,
+                    },
+                    {
+                        label: 'Power',
+                        data: power,
+                        tension: 0.25,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        hidden: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#ddd' },
+                        grid: { color: 'rgba(255,255,255,0.03)' }
+                    },
+                    y: {
+                        min: 0,
+                        max: 10,
+                        ticks: { stepSize: 1, color: '#ddd' },
+                        grid: { color: 'rgba(255,255,255,0.03)' }
+                    }
+                }
+            }
+        });
+
+        // Chart control buttons
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const metric = btn.dataset.metric;
+                if (metric === 'all') {
+                    chart.data.datasets.forEach(ds => ds.hidden = false);
+                } else {
+                    chart.data.datasets.forEach(ds => {
+                        ds.hidden = ds.label.toLowerCase() !== metric;
+                    });
+                }
+                chart.update();
+            });
+        });
+
+        // Dynamic insights generation
+        function generateInsights() {
+            const container = document.getElementById('insightsContainer');
+            container.innerHTML = '';
+            // 1. Best metric
+            const avg = {
+                fluidity: avgFluidity,
+                endurance: avgEndurance,
+                power: avgPower
+            };
+            const sorted = Object.entries(avg).sort((a,b) => b[1] - a[1]);
+            const best = sorted[0];
+
+            const insight1 = document.createElement('div');
+            insight1.className = 'insight-item';
+            insight1.innerHTML = `
+                <div class="insight-icon"><i class="bi bi-award-fill"></i></div>
+                <div class="insight-content">
+                    <div class="insight-title">Strongest Area: ${best[0].charAt(0).toUpperCase() + best[0].slice(1)}</div>
+                    <div class="insight-text">Your average ${best[0]} is ${best[1]}. Keep building on this strength with targeted drills.</div>
+                </div>
+            `;
+            container.appendChild(insight1);
+
+            // 2. Areas to improve
+            const worst = sorted[sorted.length - 1];
+            const insight2 = document.createElement('div');
+            insight2.className = 'insight-item';
+            insight2.innerHTML = `
+                <div class="insight-icon"><i class="bi bi-lightning-charge"></i></div>
+                <div class="insight-content">
+                    <div class="insight-title">Focus Area: ${worst[0].charAt(0).toUpperCase() + worst[0].slice(1)}</div>
+                    <div class="insight-text">Average ${worst[0]} is ${worst[1]}. Add specific drills to raise this by at least 1 point over the next week.</div>
+                </div>
+            `;
+            container.appendChild(insight2);
+
+            // 3. Weekly progress snapshots (if weeklyStats present)
+            if (Object.keys(weeklyStats).length) {
+                const insight3 = document.createElement('div');
+                insight3.className = 'insight-item';
+                let html = `<div class="insight-icon"><i class="bi bi-graph-up"></i></div><div class="insight-content"><div class="insight-title">Weekly Snapshot</div><div class="insight-text">`;
+                for (const [w, vals] of Object.entries(weeklyStats)) {
+                    html += `<strong>Week ${w}:</strong> F:${vals.fluidity} • E:${vals.endurance} • P:${vals.power}<br/>`;
+                }
+                html += `</div></div>`;
+                insight3.innerHTML = html;
+                container.appendChild(insight3);
+            }
+        }
+
+        generateInsights();
+
+        // History notes toggle
+        function showNotes(idx){
+            const el = document.getElementById('notes-'+idx);
+            if (!el) return;
+            el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+        }
+
+        // Expose to global for inline onclick handlers in template
+        window.showNotes = showNotes;
+    </script>
+</body>
+</html>
